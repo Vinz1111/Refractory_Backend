@@ -201,9 +201,10 @@ export default (state: GroupingsUIState) => {
         <div style="display: flex; flex: 1; justify-content: space-between; overflow: auto;">
           <bim-label style="display: none;">${value}</bim-label>
           <bim-checkbox data-id="${value}" @change=${(event: Event) => onCheckboxChange(event, value)}></bim-checkbox>
-          <bim-button @click=${() => onFocusSelection(value)} label="Focus" icon="ri:focus-mode" tooltip-title="Focus" tooltip-text="Focus the camera to the current selection."></bim-button>
+          <bim-button @click=${() => onFocusSelection(value)} icon="ri:focus-mode" tooltip-title="Focus" tooltip-text="Focus the camera to the current selection."></bim-button>
           <bim-button @click=${() => onArrowRightClick(value)} icon="ri:arrow-right-line" tooltip-title="Move Right" tooltip-text="Select and highlight the group."></bim-button>
           <bim-button @click=${() => onDeleteGroup(value)} style="flex: 0" icon="majesticons:delete-bin"></bim-button>
+          <bim-button icon="ic:round-info" tooltip-title="Info" tooltip-text="Show more information about this group." style="flex: 0"></bim-button> 
         </div> 
       `;
     },

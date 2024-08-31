@@ -1,8 +1,7 @@
 import * as THREE from "three";
 import * as OBC from "@thatopen/components";
 import * as OBF from "@thatopen/components-front";
-import * as BUI from "@thatopen/ui";
-import customSelections from "../../Tables/CustomSelections";
+import * as BUI from "@thatopen/ui";import customSelections from "../../Tables/CustomSelections";
 import { table, selectionCache, setSelectionCache } from "../../Tables/CustomSelections";
 import axios from "axios";
 
@@ -15,12 +14,13 @@ const serializeFragmentIdMap = (fragmentIdMap: any) => {
 };
 
 // Funktion zum Speichern einer neuen Section
-const saveNewSection = async (name: string, value: string, selectedColor: string): Promise<string | null> => {
+const saveNewSection = async (name: string, value: string, selectedColor: string, userComment: string): Promise<string | null> => {
   try {
     const response = await axios.post("http://localhost:5555/sections", {
       name: name,
       value: value,
       color: selectedColor[0],
+      userComment: userComment  // Kommentar speichern
     });
 
     // Nach dem Speichern die Cache-Datenbank neu abrufen
@@ -103,34 +103,37 @@ export default (components: OBC.Components) => {
   };
 
   const onSaveGroupSelection = async () => {
-    if (!(groupNameInput && groupNameInput.value.trim() !== "")) return;
-
-    newSelectionForm.style.display = "none";
-    saveSelectionBtn.style.display = "none";
-
-    const selectionData = serializeFragmentIdMap(highlighter.selection.select);
-
-    // Speichern der neuen Sektion in der Datenbank und ID abrufen
-    const newId = await saveNewSection(groupNameInput.value, selectionData, selectedColor);
-    if (newId) {
-        // Hinzufügen der neuen Gruppe zu selectionCache
-        selectionCache.push({
-            _id: newId,
-            name: groupNameInput.value,
-            value: selectionData,
-            color: selectedColor[0]
-        });
-
-        // Highlighter für die neue Sektion hinzufügen
-        const threecolor = new THREE.Color(selectedColor[0]);
-        highlighter.add(newId, threecolor);
-
-        // Tabelle aktualisieren
-        
-        highlighter.clear();
-    }
-    // Reset des Input-Feldes
-    groupNameInput.value = "";
+      if (!(groupNameInput && groupNameInput.value.trim() !== "")) return;
+  
+      newSelectionForm.style.display = "none";
+      saveSelectionBtn.style.display = "none";
+  
+      const selectionData = serializeFragmentIdMap(highlighter.selection.select);
+      const userComment = groupCommentInput.value; // Declare the 'userComment' variable and assign it the value from 'groupCommentInput'
+  
+      // Speichern der neuen Sektion in der Datenbank und ID abrufen
+      const newId = await saveNewSection(groupNameInput.value, selectionData, selectedColor, userComment);
+      if (newId) {
+          // Hinzufügen der neuen Gruppe zu selectionCache
+          selectionCache.push({
+              _id: newId,
+              name: groupNameInput.value,
+              value: selectionData,
+              color: selectedColor[0],
+              comment: userComment  // Kommentar speichern
+          });
+  
+          // Highlighter für die neue Sektion hinzufügen
+          const threecolor = new THREE.Color(selectedColor[0]);
+          highlighter.add(newId, threecolor);
+  
+          // Tabelle aktualisieren
+          
+          highlighter.clear();
+      }
+      // Reset des Input-Feldes
+      groupNameInput.value = "";
+      groupCommentInput.value = "";  // Kommentar zurücksetzen
   };
 
   const onNewSelection = () => {
@@ -161,23 +164,43 @@ export default (components: OBC.Components) => {
     selectedColor = dropdown.value; // Speichere die ausgewählte Farbe als String
   };
 
+  let groupCommentInput: BUI.TextInput;
+
+  const onGroupCommentInputCreated = (e?: Element) => {
+    if (!e) return;
+    groupCommentInput = e as BUI.TextInput;
+    highlighter.events.select.onClear.add(() => {
+      groupCommentInput.value = "";
+    });
+  };
+  
   return BUI.Component.create<BUI.PanelSection>(() => {
     return BUI.html`
       <bim-panel-section label="Custom Selections" icon="clarity:blocks-group-solid">
-        <div ${BUI.ref(onFormCreated)} style="display: none; gap: 0.5rem">
-          <bim-text-input ${BUI.ref(onGroupNameInputCreated)} placeholder="Selection Name..." vertical></bim-text-input>
+        <div ${BUI.ref(onFormCreated)} style="display: none; flex-direction: column; gap: 0.5rem;">
           
-          <bim-dropdown @change=${onColorSelected}>
-          ${colorOptions.map(option => BUI.html`
-          <bim-option value="${option.value}" label="${option.label}"></bim-option>`)}
-          </bim-dropdown>
-
-          <bim-button @click=${onSaveGroupSelection} icon="mingcute:check-fill" style="flex: 0" label="Accept"></bim-button>
-          <bim-button @click=${onCancelGroupCreation} icon="mingcute:close-fill" style="flex: 0" label="Cancel"></bim-button>
+          <div style="display: flex; gap: 0.5rem;">
+            <bim-text-input ${BUI.ref(onGroupNameInputCreated)} placeholder="Selection Name..." vertical></bim-text-input>
+  
+            <bim-dropdown @change=${onColorSelected}>
+              ${colorOptions.map(option => BUI.html`
+              <bim-option value="${option.value}" label="${option.label}"></bim-option>`)}
+            </bim-dropdown>
+  
+            <bim-button @click=${onSaveGroupSelection} icon="mingcute:check-fill" style="flex: 0" label="Accept"></bim-button>
+            <bim-button @click=${onCancelGroupCreation} icon="mingcute:close-fill" style="flex: 0" label="Cancel"></bim-button>
+          </div>
+          
+          <textarea 
+            ${BUI.ref(onGroupCommentInputCreated)} 
+            placeholder="Your comment..." 
+            rows="5" 
+            style="width: 100%; resize: vertical;"></textarea>
+          
         </div>
         ${customSelectionsTable}
         <bim-button style="display: none;" ${BUI.ref(onSaveSelectionCreated)} @click=${onNewSelection} label="Save Selection"></bim-button>
       </bim-panel-section>
     `;
   });
-};
+};  
