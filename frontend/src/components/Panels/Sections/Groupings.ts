@@ -26,6 +26,7 @@ const saveNewSection = async (name: string, value: string, selectedColor: string
     // Nach dem Speichern die Cache-Datenbank neu abrufen
     const newCache = await fetchSectionsFromDatabase();
     setSelectionCache(newCache);  // Aktualisiere den globalen Cache
+    updateTable();
 
     return response.data._id;  // ID des neu erstellten Eintrags zurückgeben
   } catch (error) {
@@ -125,11 +126,9 @@ export default (components: OBC.Components) => {
         highlighter.add(newId, threecolor);
 
         // Tabelle aktualisieren
-        updateTable();
-
+        
         highlighter.clear();
     }
-
     // Reset des Input-Feldes
     groupNameInput.value = "";
   };
