@@ -38,7 +38,7 @@ export default (components: OBC.Components) => {
   return BUI.Component.create<BUI.Panel>(() => {
     return BUI.html`
       <bim-panel>
-        <bim-panel-section name="selection" label="Selection Information" icon="solar:document-bold" fixed>
+        <bim-panel-section name="selection" label="Selection Information in work" icon="solar:document-bold" fixed>
           ${propsTable}
         </bim-panel-section>
       </bim-panel> 

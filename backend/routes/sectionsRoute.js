@@ -54,14 +54,18 @@ router.get('/search', async(request, response) => {
 // Route for Get One Section by ID
 router.get('/:id', async(request, response) => {
     try {
-        const {id} = request.params;
+        const { id } = request.params;
         const section = await Section.findById(id);
-        return response.status(200).json(section)
+        if (!section) {
+            return response.status(404).send({ message: 'Section not found' });
+        }
+        return response.status(200).json(section);
     } catch (error) {
         console.log(error.message);
         return response.status(500).send({ message: error.message });
     }
 });
+
 
 // Route for Get all Sections
 router.get('/', async(request, response) => {
