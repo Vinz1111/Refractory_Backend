@@ -6,7 +6,7 @@ const router = express.Router();
 //Route for Save a new section
 router.post('/', async(request, response) => {
     try {
-        if (!request.body.name ||!request.body.value ||!request.body.color ) 
+        if (!request.body.name ||!request.body.value ||!request.body.color ||!request.body.userComment ) 
             {
         return response.status(400).send({ message: 'Missing information' });
     }
@@ -15,6 +15,7 @@ router.post('/', async(request, response) => {
         name: request.body.name,
         value: request.body.value,
         color: request.body.color,
+        userComment: request.body.userComment,
 
     };
 

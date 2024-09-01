@@ -14,10 +14,10 @@ const sectionSchema = new mongoose.Schema(
             type: String, //input type text
             required: true 
         },
-        //author: {
-        //    type: String,
-        //    required: true
-        //},
+        userComment: {
+            type: String,
+            required: false
+        },
         //passwort: {
         //    type: String,
         //    required: true

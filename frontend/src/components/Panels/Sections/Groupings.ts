@@ -22,7 +22,6 @@ const saveNewSection = async (name: string, value: string, selectedColor: string
       color: selectedColor[0],
       userComment: userComment  // Kommentar speichern
     });
-
     // Nach dem Speichern die Cache-Datenbank neu abrufen
     const newCache = await fetchSectionsFromDatabase();
     setSelectionCache(newCache);  // Aktualisiere den globalen Cache
