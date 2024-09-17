@@ -19,7 +19,7 @@ const saveNewSection = async (name: string, value: string, selectedColor: string
     const response = await axios.post("http://localhost:5555/sections", {
       name: name,
       value: value,
-      color: selectedColor[0],
+      color: selectedColor,
       userComment: userComment  // Kommentar speichern
     });
     // Nach dem Speichern die Cache-Datenbank neu abrufen
@@ -111,19 +111,20 @@ export default (components: OBC.Components) => {
       const userComment = groupCommentInput.value; // Declare the 'userComment' variable and assign it the value from 'groupCommentInput'
   
       // Speichern der neuen Sektion in der Datenbank und ID abrufen
-      const newId = await saveNewSection(groupNameInput.value, selectionData, selectedColor, userComment);
+      const newId = await saveNewSection(groupNameInput.value, selectionData, selectedColor.value, userComment);
       if (newId) {
+          const threecolor = new THREE.Color(selectedColor.value);
           // Hinzufügen der neuen Gruppe zu selectionCache
           selectionCache.push({
               _id: newId,
               name: groupNameInput.value,
               value: selectionData,
-              color: selectedColor[0],
+              color: threecolor,
               comment: userComment  // Kommentar speichern
           });
   
           // Highlighter für die neue Sektion hinzufügen
-          const threecolor = new THREE.Color(selectedColor[0]);
+          
           highlighter.add(newId, threecolor);
   
           // Tabelle aktualisieren
@@ -149,19 +150,22 @@ export default (components: OBC.Components) => {
   };
 
   // Hier werden die Farben als Hexadezimalwerte definiert
+  /*
   const colorOptions = [
     { label: "Rot", value: "rgb(255, 0, 0)" },  
     { label: "Orang", value: "rgb(255, 165, 0)" },  
     { label: "Grün", value: "rgb(0, 128, 0)" },     
     { label: "Blau", value: "rgb(0, 0, 255)" }  
   ];
-
-  let selectedColor = "rgb(255, 0, 0)"; // Standardfarbe (Rot)
-
+  */
+  let selectedColor = { label: "Blau", value: "rgb(0, 0, 255)" }; // Standardfarbe (Rot)
+  
+  /*
   const onColorSelected = (event: Event) => {
     const dropdown = event.target as HTMLSelectElement;
     selectedColor = dropdown.value; // Speichere die ausgewählte Farbe als String
   };
+  */
 
   let groupCommentInput: BUI.TextInput;
 
@@ -180,12 +184,14 @@ export default (components: OBC.Components) => {
           
           <div style="display: flex; gap: 0.5rem;">
             <bim-text-input ${BUI.ref(onGroupNameInputCreated)} placeholder="Selection Name..." vertical></bim-text-input>
-  
+            
+            ${/*
             <bim-dropdown @change=${onColorSelected}>
               ${colorOptions.map(option => BUI.html`
               <bim-option value="${option.value}" label="${option.label}"></bim-option>`)}
             </bim-dropdown>
-  
+              */``}
+
             <bim-button @click=${onSaveGroupSelection} icon="mingcute:check-fill" style="flex: 0" label="Accept"></bim-button>
             <bim-button @click=${onCancelGroupCreation} icon="mingcute:close-fill" style="flex: 0" label="Cancel"></bim-button>
           </div>

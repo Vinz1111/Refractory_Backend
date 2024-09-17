@@ -4,11 +4,13 @@ import * as OBF from "@thatopen/components-front";
 import * as BUI from "@thatopen/ui";
 import { world } from '../../main.ts';
 import axios from "axios";
+import '../../style.css';  // Importiere die ausgelagerte CSS-Datei
+
 
 export let selectionCache: any[] = [];
 
 export function setSelectionCache(newCache: any[]) {
-    selectionCache = newCache;
+  selectionCache = newCache;
 }
 
 export let table: any; // Globale Variable für die Tabelle
@@ -35,11 +37,9 @@ const fetchSectionsFromDatabase = async () => {
 
 interface GroupingsUIState {
   components: OBC.Components;
-  
 }
 
 export default (state: GroupingsUIState) => {
-
   const { components } = state;
   const highlighter = components.get(OBF.Highlighter);
 
@@ -51,6 +51,10 @@ export default (state: GroupingsUIState) => {
     fetchSectionsFromDatabase().then((selection) => {
       selectionCache = selection;
       selection.forEach((group: any) => {
+        group.creator = "John Doe"; // Beispielwert, kann angepasst werden
+
+        console.log(group)
+
         const fragmentIdMap = group.value;
         const color = group.color;
         const name = group.name;
@@ -62,6 +66,7 @@ export default (state: GroupingsUIState) => {
             color: color,
             selected: false,
             id: id,
+            //CreationDate: creationDate,
           },
         };
         const threecolor = new THREE.Color(color);
@@ -100,26 +105,21 @@ export default (state: GroupingsUIState) => {
   const onCheckboxChange = (event: Event, id: string) => {
     const checkbox = event.target as HTMLInputElement;
     const isChecked = checkbox.checked;
-  
+
     const group = selectionCache.find(group => group._id === id);
     if (group) {
       group.selected = isChecked;
-  
+
       if (isChecked) {
         const idMap = JSON.parse(group.value);
         highlighter.highlightByID(id, idMap, true, false);
       } else {
-        // Fragmente, die mit der aktuellen Gruppe verknüpft sind
         const deselectedIdMap = JSON.parse(group.value);
-  
-        // Überprüfen, ob andere selektierte Gruppen gemeinsame Fragmente haben
         let sharedFragments: Record<string, any> = {};
-  
+
         selectionCache.forEach(selectedGroup => {
           if (selectedGroup.selected && selectedGroup._id !== id) {
             const selectedIdMap = JSON.parse(selectedGroup.value);
-  
-            // Überprüfen, welche Fragmente geteilt werden
             Object.keys(selectedIdMap).forEach(fragmentId => {
               if (fragmentId in deselectedIdMap) {
                 sharedFragments[fragmentId] = selectedIdMap[fragmentId];
@@ -127,11 +127,9 @@ export default (state: GroupingsUIState) => {
             });
           }
         });
-  
-        // Entferne die Gruppe, die deselektiert wurde
+
         highlighter.clear(id);
-  
-        // Hebe die gemeinsamen Fragmente hervor, die in anderen Gruppen noch selektiert sind
+
         Object.keys(sharedFragments).forEach(fragmentId => {
           const sharedGroup = selectionCache.find(g => JSON.parse(g.value).hasOwnProperty(fragmentId) && g.selected);
           if (sharedGroup) {
@@ -141,11 +139,9 @@ export default (state: GroupingsUIState) => {
         });
       }
     }
-    
   };
-  
+
   const onFocusSelection = async (id: string) => {
-    
     if (!world) return;
     if (!world.camera.hasCameraControls()) return;
 
@@ -171,11 +167,10 @@ export default (state: GroupingsUIState) => {
       return;
     }
 
-    sphere.radius *= 1.2; // Optional: Zoom etwas heraus, um Puffer zu geben
+    sphere.radius *= 1.2;
     const camera = world.camera;
     await camera.controls.fitToSphere(sphere, true);
   };
-
 
   const onArrowRightClick = (id: string) => {
     const group = selectionCache.find(group => group._id === id);
@@ -188,7 +183,34 @@ export default (state: GroupingsUIState) => {
     }
   };
 
-  
+  const formatDateTime = (isoString: any) => {
+    const date = new Date(isoString);
+    return date.toLocaleDateString('de-DE') + ' ' + date.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+  };
+
+  const showPopup = (group: any) => {
+    const popup = document.createElement("div");
+    popup.classList.add("popup");
+
+    const formattedDate = group.updatedAt ? formatDateTime(group.updatedAt) : "Unbekannt";
+
+    popup.innerHTML = `
+      <h2>Subset Info</h2>
+      <p><strong>Name:</strong> ${group.name}</p>
+      <p><strong>ID:</strong> ${group._id}</p>
+      <p><strong>Erstellername:</strong> ${group.creator || "Unbekannt"}</p>
+      <p><strong>Erstellungsdatum:</strong> ${formattedDate}</p>
+      <button id="closePopup">Schließen</button>
+    `;
+
+    document.body.appendChild(popup);
+
+    const closeButton = popup.querySelector("#closePopup");
+    closeButton?.addEventListener("click", () => {
+      document.body.removeChild(popup);
+    });
+  };
+
   table = document.createElement("bim-table");
   table.headersHidden = true;
   table.hiddenColumns = ["fragmentIdMap", "color", "selected"];
@@ -197,6 +219,8 @@ export default (state: GroupingsUIState) => {
     id: (value: any) => {
       if (typeof value !== "string") return value;
   
+      const group = selectionCache.find(group => group._id === value);
+  
       return BUI.html`
         <div style="display: flex; flex: 1; justify-content: space-between; overflow: auto;">
           <bim-label style="display: none;">${value}</bim-label>
@@ -204,12 +228,11 @@ export default (state: GroupingsUIState) => {
           <bim-button @click=${() => onFocusSelection(value)} icon="ri:focus-mode" tooltip-title="Focus" tooltip-text="Focus the camera to the current selection."></bim-button>
           <bim-button @click=${() => onArrowRightClick(value)} icon="ri:arrow-right-line" tooltip-title="Move Right" tooltip-text="Select and highlight the group."></bim-button>
           <bim-button @click=${() => onDeleteGroup(value)} style="flex: 0" icon="majesticons:delete-bin"></bim-button>
-          <bim-button icon="ic:round-info" tooltip-title="Info" tooltip-text="Show more information about this group." style="flex: 0"></bim-button> 
+          <bim-button @click=${() => showPopup(group)} icon="ic:round-info" tooltip-title="Info" tooltip-text="Show more information about this Selection." style="flex: 0"></bim-button> 
         </div> 
       `;
     },
   };
-  
 
   table.addEventListener("cellcreated", ({ detail }: { detail: any }) => {
     const { cell } = detail;

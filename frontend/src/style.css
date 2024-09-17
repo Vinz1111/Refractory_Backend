@@ -84,3 +84,36 @@ bim-grid:not([floating]) > bim-panel {
 bim-grid[floating] > bim-toolbar {
   justify-self: center;
 }
+
+.popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: var(--bim-ui_bg-base);
+  border: 1px solid var(--bim-ui_bg-contrast-60);
+  padding: 20px;
+  z-index: 1000;
+  width: 300px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  color: var(--bim-ui_bg-contrast-100); /* Textfarbe passend zum Hintergrund */
+}
+
+.popup h2 {
+  margin-bottom: 10px;
+}
+
+.popup button {
+  margin-top: 10px;
+  background-color: var(--bim-ui_accent-base);
+  color: var(--bim-ui_accent-contrast);
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.popup button:hover {
+  background-color: var(--bim-ui_accent-contrast);
+  color: var(--bim-ui_accent-base);
+}

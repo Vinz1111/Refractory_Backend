@@ -18,10 +18,14 @@ const sectionSchema = new mongoose.Schema(
             type: String,
             required: false
         },
-        //passwort: {
-        //    type: String,
-        //    required: true
-        //},
+        creatior: {
+            type: String,
+            required: false
+        },
+        role: {
+            type: String,
+            required: false
+        },
     },
     {
         timestamps: true,
