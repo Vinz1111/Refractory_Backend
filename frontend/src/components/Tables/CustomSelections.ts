@@ -51,14 +51,16 @@ export default (state: GroupingsUIState) => {
     fetchSectionsFromDatabase().then((selection) => {
       selectionCache = selection;
       selection.forEach((group: any) => {
-        group.creator = "John Doe"; // Beispielwert, kann angepasst werden
-
-        console.log(group)
+        
 
         const fragmentIdMap = group.value;
         const color = group.color;
         const name = group.name;
         const id = group._id;
+        const autor = "Vinzent"
+        const role =  "Berater"
+        const task = "1"
+        
         const groupRow: BUI.TableGroupData = {
           data: {
             Name: name,
@@ -66,7 +68,9 @@ export default (state: GroupingsUIState) => {
             color: color,
             selected: false,
             id: id,
-            //CreationDate: creationDate,
+            autor: autor,
+            role: role,
+            task: task,
           },
         };
         const threecolor = new THREE.Color(color);
@@ -92,6 +96,10 @@ export default (state: GroupingsUIState) => {
           color: group.color,
           selected: false,
           id: group._id,
+          autor: group.autor,
+          role: group.role,
+          task: group.task,
+          
         },
       }));
       highlighter.clear();
@@ -198,7 +206,9 @@ export default (state: GroupingsUIState) => {
       <h2>Subset Info</h2>
       <p><strong>Name:</strong> ${group.name}</p>
       <p><strong>ID:</strong> ${group._id}</p>
-      <p><strong>Erstellername:</strong> ${group.creator || "Unbekannt"}</p>
+      <p><strong>Erstellername:</strong> ${group.autor || "Unbekannt"}</p>
+      <p><strong>Rolle:</strong> ${group.role || "Unbekannt"}</p>
+      <p><strong>Aufgabe:</strong> ${group.task || "Unbekannt"}</p>
       <p><strong>Erstellungsdatum:</strong> ${formattedDate}</p>
       <button id="closePopup">Schließen</button>
     `;

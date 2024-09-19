@@ -1,9 +1,11 @@
 import * as THREE from "three";
 import * as OBC from "@thatopen/components";
 import * as OBF from "@thatopen/components-front";
-import * as BUI from "@thatopen/ui";import customSelections from "../../Tables/CustomSelections";
+import * as BUI from "@thatopen/ui";
+import customSelections from "../../Tables/CustomSelections";
 import { table, selectionCache, setSelectionCache } from "../../Tables/CustomSelections";
 import axios from "axios";
+
 
 const serializeFragmentIdMap = (fragmentIdMap: any) => {
   const map: Record<string, number[]> = {};
@@ -14,13 +16,16 @@ const serializeFragmentIdMap = (fragmentIdMap: any) => {
 };
 
 // Funktion zum Speichern einer neuen Section
-const saveNewSection = async (name: string, value: string, selectedColor: string, userComment: string): Promise<string | null> => {
+const saveNewSection = async (name: string, value: string, selectedColor: string, userComment: string, autor: string, role: string, task: string): Promise<string | null> => {
   try {
     const response = await axios.post("http://localhost:5555/sections", {
       name: name,
       value: value,
       color: selectedColor,
-      userComment: userComment  // Kommentar speichern
+      userComment: userComment,  // Kommentar speichern
+      autor: autor,
+      role: role,
+      task: task,
     });
     // Nach dem Speichern die Cache-Datenbank neu abrufen
     const newCache = await fetchSectionsFromDatabase();
@@ -57,6 +62,10 @@ const updateTable = async () => {
         color: group.color,
         selected: false,
         id: group._id,
+        autor: group.autor,
+        role: group.role, 
+        task: group.task,
+        
       }
     }));
     table.data = tableData; // Aktualisiere die Tabelle
@@ -109,18 +118,26 @@ export default (components: OBC.Components) => {
   
       const selectionData = serializeFragmentIdMap(highlighter.selection.select);
       const userComment = groupCommentInput.value; // Declare the 'userComment' variable and assign it the value from 'groupCommentInput'
-  
+      const autor = "Vinzent";
+      const role = "Berater";
+      const task = "1";
+
       // Speichern der neuen Sektion in der Datenbank und ID abrufen
-      const newId = await saveNewSection(groupNameInput.value, selectionData, selectedColor.value, userComment);
+      const newId = await saveNewSection(groupNameInput.value, selectionData, selectedColor.value, userComment, autor, role, task);
       if (newId) {
           const threecolor = new THREE.Color(selectedColor.value);
+          
           // Hinzufügen der neuen Gruppe zu selectionCache
           selectionCache.push({
               _id: newId,
               name: groupNameInput.value,
               value: selectionData,
               color: threecolor,
-              comment: userComment  // Kommentar speichern
+              comment: userComment,  // Kommentar speichern
+              autor:autor,
+              role: role,
+              task: task,
+              
           });
   
           // Highlighter für die neue Sektion hinzufügen
