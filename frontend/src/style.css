@@ -106,7 +106,7 @@ bim-grid[floating] > bim-toolbar {
 .popup button {
   margin-top: 10px;
   background-color: var(--bim-ui_accent-base);
-  color: var(--bim-ui_accent-contrast);
+  color: white; /* Schriftfarbe auf Weiß gesetzt */
   border: none;
   padding: 10px;
   cursor: pointer;
@@ -115,5 +115,6 @@ bim-grid[floating] > bim-toolbar {
 
 .popup button:hover {
   background-color: var(--bim-ui_accent-contrast);
-  color: var(--bim-ui_accent-base);
+  color: var(--bim-ui_accent-base); /* Bei Hover Zustand bleibt die Umkehrung der Farben */
 }
+
