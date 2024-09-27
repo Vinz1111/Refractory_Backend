@@ -223,7 +223,7 @@ export default (state: GroupingsUIState) => {
 
   table = document.createElement("bim-table");
   table.headersHidden = true;
-  table.hiddenColumns = ["fragmentIdMap", "color", "selected"];
+  table.hiddenColumns = ["fragmentIdMap", "color", "selected", "autor", "role", "task"];
 
   table.dataTransform = {
     id: (value: any) => {
