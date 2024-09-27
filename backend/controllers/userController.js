@@ -29,7 +29,7 @@ const createUser = asyncHandler(async (req, res) => {
     });
   } catch (error) {
     res.status(400);
-    throw new Error("Invalid user data");
+    throw new Error("Ungültige User Daten");
   }
 });
 
