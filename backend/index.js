@@ -2,7 +2,8 @@ import express from 'express';
 import { PORT, mongoDBURL } from './config.js';
 import mongoose from 'mongoose';
 import { Section } from './models/sectionModel.js';
-import sectionsRoute from './routes/sectionsRoute.js';    
+import sectionsRoute from './routes/sectionsRoute.js';
+import userRoutes from "./routes/userRoutes.js";
 import cors from 'cors';
 
 const app = express();
@@ -30,7 +31,7 @@ app.get('/', (request, response) => {
 });
 
 app.use('/sections', sectionsRoute);
-
+app.use("/api/users", userRoutes);
 
 mongoose.connect(mongoDBURL)
     .then(() => {
