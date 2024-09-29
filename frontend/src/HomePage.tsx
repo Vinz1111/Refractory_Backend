@@ -1,4 +1,4 @@
-// HomePage.tsx
+
 import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import * as OBC from '@thatopen/components';
