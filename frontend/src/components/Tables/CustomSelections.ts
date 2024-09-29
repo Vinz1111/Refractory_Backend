@@ -2,7 +2,7 @@ import * as THREE from "three";
 import * as OBC from "@thatopen/components";
 import * as OBF from "@thatopen/components-front";
 import * as BUI from "@thatopen/ui";
-import { world } from '../../main.ts';
+import { world } from '../../HomePage.js';
 import axios from "axios";
 import '../../style.css';  // Importiere die ausgelagerte CSS-Datei
 
